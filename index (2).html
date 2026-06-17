@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DUC 리타겟팅 Phase 1 결과 보고</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --color-text-primary: #1a1a1a;
+    --color-text-secondary: #4a4a4a;
+    --color-text-tertiary: #888;
+    --color-background-primary: #ffffff;
+    --color-background-secondary: #f5f5f5;
+    --color-border-tertiary: rgba(0,0,0,0.1);
+    --color-border-secondary: rgba(0,0,0,0.2);
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-text-primary: #e8e6e0;
+      --color-text-secondary: #b0ae a8;
+      --color-text-tertiary: #888;
+      --color-background-primary: #1e1e1e;
+      --color-background-secondary: #2a2a2a;
+      --color-border-tertiary: rgba(255,255,255,0.1);
+      --color-border-secondary: rgba(255,255,255,0.2);
+    }
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-background-primary);
+    color: var(--color-text-primary);
+    padding: 24px;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  /* ── Section labels ── */
+  .section-label {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--color-text-tertiary); margin-bottom: 6px;
+  }
+  .section-label .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--color-text-tertiary);
+  }
+  h1 { font-size: 22px; font-weight: 500; line-height: 1.35; margin-bottom: 6px; }
+  h2 { font-size: 18px; font-weight: 500; margin-bottom: 8px; line-height: 1.4; }
+  p  { font-size: 14px; color: var(--color-text-secondary); line-height: 1.7; }
+
+  .report-meta { font-size: 12px; color: var(--color-text-tertiary); }
+
+  .divider {
+    border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 32px 0;
+  }
+
+  /* ── Title ── */
+  .title-block { padding: 8px 0 20px; }
+
+  /* ── Metric cards ── */
+  .exec-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0;
+  }
+  .exec-card {
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-md); padding: 14px 16px;
+  }
+  .exec-card .label { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 4px; }
+  .exec-card .value { font-size: 22px; font-weight: 500; line-height: 1; }
+  .exec-card .sub   { font-size: 11px; color: var(--color-text-tertiary); margin-top: 3px; }
+  .exec-card.positive .value { color: #1D9E75; }
+
+  .conclusion-box {
+    border: 0.5px solid var(--color-border-tertiary);
+    border-left: 3px solid #1D9E75;
+    border-radius: var(--border-radius-md);
+    padding: 12px 16px; margin-top: 12px;
+    background: var(--color-background-secondary);
+  }
+  .conclusion-box p { font-size: 13px; }
+
+  /* ── Problem cards ── */
+  .problem-cards {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0;
+  }
+  .problem-card {
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-md); padding: 14px 16px;
+  }
+  .problem-card h3 { font-size: 13px; font-weight: 500; margin-bottom: 6px; }
+  .problem-card p  { font-size: 12px; }
+
+  .arrow-down {
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px; margin: 8px 0 0; color: var(--color-text-tertiary); font-size: 12px;
+  }
+
+  /* ── Before/After ── */
+  .compare-grid {
+    display: grid; grid-template-columns: 1fr 40px 1fr; margin: 16px 0;
+  }
+  .compare-side {
+    border: 0.5px solid var(--color-border-tertiary); padding: 14px;
+  }
+  .compare-side.before { border-radius: 8px 0 0 8px; border-right: none; }
+  .compare-side.after  { border-radius: 0 8px 8px 0; border-left: none; background: #f0fbf7; }
+  .compare-arrow {
+    display: flex; align-items: center; justify-content: center;
+    background: var(--color-background-secondary);
+    border-top: 0.5px solid var(--color-border-tertiary);
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+    font-size: 16px; color: var(--color-text-tertiary);
+  }
+  .compare-side .period {
+    font-size: 10px; font-weight: 500; color: var(--color-text-tertiary);
+    text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px;
+  }
+  .compare-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 5px 0; border-bottom: 0.5px solid var(--color-border-tertiary); gap: 8px;
+  }
+  .compare-row:last-child { border-bottom: none; }
+  .compare-row .mn { font-size: 12px; color: var(--color-text-secondary); }
+  .compare-row .mv { font-size: 13px; font-weight: 500; }
+  .mv.up   { color: #1D9E75; }
+  .mv.down { color: #BA7517; }
+
+  /* ── Segment table ── */
+  .segment-tree {
+    margin: 16px 0; border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-md); overflow: hidden;
+  }
+  .seg-header {
+    background: var(--color-background-secondary); padding: 10px 16px;
+    font-size: 12px; font-weight: 500; color: var(--color-text-secondary);
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+  }
+  .seg-row {
+    display: flex; align-items: center; padding: 8px 16px;
+    border-bottom: 0.5px solid var(--color-border-tertiary); gap: 10px; font-size: 12px;
+  }
+  .seg-row:last-child { border-bottom: none; }
+  .seg-badge {
+    font-size: 10px; font-weight: 500; padding: 2px 8px;
+    border-radius: 100px; white-space: nowrap;
+  }
+  .badge-payer  { background: #E1F5EE; color: #0F6E56; }
+  .badge-nonpay { background: #F1EFE8; color: #5F5E5A; }
+  .seg-name { font-weight: 500; flex: 1; }
+  .seg-roas { margin-left: auto; font-weight: 500; }
+  .seg-roas.pass { color: #1D9E75; }
+  .seg-roas.fail { color: #BA7517; }
+
+  /* ── ROAS bar ── */
+  .roas-bars { margin: 16px 0; }
+  .roas-bar-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 8px; font-size: 12px;
+  }
+  .roas-bar-label { width: 100px; text-align: right; color: var(--color-text-secondary); flex-shrink: 0; }
+  .roas-bar-track { flex: 1; height: 22px; background: var(--color-background-secondary); border-radius: 4px; overflow: hidden; }
+  .roas-bar-fill  { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 6px; transition: width .4s ease; }
+  .roas-bar-val   { width: 58px; font-weight: 500; flex-shrink: 0; }
+  .roas-bar-check { width: 20px; flex-shrink: 0; }
+
+  /* ── Insight cards ── */
+  .insight-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0;
+  }
+  .insight-card {
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-md); padding: 14px 16px;
+  }
+  .insight-card .tag {
+    font-size: 10px; font-weight: 500; padding: 2px 8px;
+    border-radius: 100px; margin-bottom: 8px; display: inline-block;
+  }
+  .tag-blue  { background: #E6F1FB; color: #185FA5; }
+  .tag-green { background: #E1F5EE; color: #0F6E56; }
+  .tag-amber { background: #FAEEDA; color: #854F0B; }
+  .tag-gray  { background: #F1EFE8; color: #5F5E5A; }
+  .insight-card h3 { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .insight-card p  { font-size: 12px; }
+
+  /* ── Next step timeline ── */
+  .timeline { margin: 16px 0; }
+  .tl-item  { display: flex; gap: 12px; padding-bottom: 20px; }
+  .tl-item:last-child { padding-bottom: 0; }
+  .tl-left  { display: flex; flex-direction: column; align-items: center; }
+  .tl-dot   {
+    width: 10px; height: 10px; border-radius: 50%; border: 2px solid;
+    flex-shrink: 0; margin-top: 3px;
+  }
+  .tl-dot.done   { background: #1D9E75; border-color: #1D9E75; }
+  .tl-dot.next   { background: #fff; border-color: #378ADD; }
+  .tl-dot.future { background: #fff; border-color: #ccc; }
+  .tl-line { width: 1px; flex: 1; background: var(--color-border-tertiary); margin: 4px 0 0; }
+  .tl-content { flex: 1; }
+  .tl-content .phase-label {
+    font-size: 10px; font-weight: 500; text-transform: uppercase;
+    letter-spacing: .05em; color: var(--color-text-tertiary); margin-bottom: 2px;
+  }
+  .tl-content h3 { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+  .tl-content p  { font-size: 12px; }
+  .tl-status {
+    font-size: 10px; font-weight: 500; padding: 2px 8px;
+    border-radius: 100px; display: inline-flex; align-items: center;
+    gap: 4px; margin-top: 4px;
+  }
+  .status-done   { background: #E1F5EE; color: #0F6E56; }
+  .status-next   { background: #E6F1FB; color: #185FA5; }
+  .status-future { background: #F1EFE8; color: #5F5E5A; }
+
+  /* ── Footnote ── */
+  .footnote { font-size: 11px; color: var(--color-text-tertiary); margin-top: 8px; }
+
+  @media (max-width: 520px) {
+    .exec-grid, .problem-cards, .insight-grid { grid-template-columns: 1fr; }
+    .compare-grid { grid-template-columns: 1fr; }
+    .compare-side.before { border-radius: 8px 8px 0 0; border-right: 0.5px solid var(--color-border-tertiary); border-bottom: none; }
+    .compare-side.after  { border-radius: 0 0 8px 8px; border-left: 0.5px solid var(--color-border-tertiary); }
+    .compare-arrow { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Title ── -->
+<div class="title-block">
+  <div class="section-label"><span class="dot"></span> DUC 리타겟팅 오디언스 세그먼트 테스트</div>
+  <h1>결제 유저 중심 세그먼트 고도화로<br>매출 +25%, 결제자 +36% 달성</h1>
+  <p class="report-meta">운영 기간: 2026.04.02 – 2026.06.09 &nbsp;·&nbsp; Phase 1 결과 보고</p>
+</div>
+
+<!-- ── 1. Executive Summary ── -->
+<div class="section-label"><span class="dot"></span> 한눈에 보는 결과</div>
+<div class="exec-grid">
+  <div class="exec-card positive">
+    <div class="label">매출 (Revenue)</div>
+    <div class="value">+25%</div>
+    <div class="sub">$1.97M → $1.58M 이전 대비</div>
+  </div>
+  <div class="exec-card positive">
+    <div class="label">결제자 수</div>
+    <div class="value">+36%</div>
+    <div class="sub">140K → 190K명</div>
+  </div>
+  <div class="exec-card">
+    <div class="label">ROAS (수익성)</div>
+    <div class="value">131%</div>
+    <div class="sub">이전 133% → 2%p 소폭 하락만</div>
+  </div>
+</div>
+<div class="conclusion-box">
+  <p>광고비를 27% 더 집행했지만, 수익성(ROAS)은 거의 그대로 유지하면서 매출과 결제자 규모를 동시에 키웠습니다. 마케팅팀 26년 상반기 목표인 <strong>구매 지표 개선 + 매출 증대</strong>를 달성했습니다.</p>
+</div>
+
+<hr class="divider">
+
+<!-- ── 2. Background ── -->
+<div class="section-label"><span class="dot"></span> 배경 — 왜 이 테스트를 시작했나</div>
+<h2>비용을 늘려도 매출이 늘지 않는 구조, 세그먼트 고도화로 돌파</h2>
+<p style="margin-bottom:14px">이전까지는 단순히 광고비를 늘리는 방식으로 매출 성장을 추구했습니다. 하지만 2025년 데이터 분석 결과, 이 방식의 한계가 명확했습니다.</p>
+
+<div class="problem-cards">
+  <div class="problem-card">
+    <h3>비용 늘려도 결제자는 그대로</h3>
+    <p>AOS 기준 광고비 최저~최고 간 71% 차이가 나도, 결제 유저 수는 1만 명대로 수렴. 추가 비용이 새로운 유저에게 닿지 못하고 중복 노출로 낭비됨.</p>
+  </div>
+  <div class="problem-card">
+    <h3>고가치·저가치 유저가 뒤섞임</h3>
+    <p>기존 세그먼트(누적 결제금액 × 마지막 결제일)는 유저 가치를 세밀하게 구분하지 못해, 재결제 가능성이 낮은 유저에게도 동일한 예산이 소진됨.</p>
+  </div>
+  <div class="problem-card">
+    <h3>도달 가능한 유저 풀 포화</h3>
+    <p>전체 구매 유저를 이미 타겟팅 중이라 비용을 더 써도 새로운 유저에게 닿을 수 없는 상태. 지금은 더 많은 유저가 아닌, <em>더 좋은 유저</em>에게 집중해야 함.</p>
+  </div>
+  <div class="problem-card">
+    <h3>2026년 목표: 선별 리타겟팅 전환</h3>
+    <p>24→25년 매출 성장의 핵심은 복귀 PUR 개선. 26년은 복귀 볼륨보다 고가치 유저 집중 투자로 PUR·ARPPU를 동시에 개선하는 방식으로 전환.</p>
+  </div>
+</div>
+<div class="arrow-down">↓ &nbsp;그래서 세그먼트 기준 자체를 바꾸는 체계적 테스트를 시작</div>
+
+<hr class="divider">
+
+<!-- ── 3. Before vs After ── -->
+<div class="section-label"><span class="dot"></span> 이전 대비 변화</div>
+<h2>같은 기간, 무엇이 달라졌나</h2>
+<div class="compare-grid">
+  <div class="compare-side before">
+    <div class="period">이전 동기간</div>
+    <div class="compare-row"><span class="mn">운영 기간</span><span class="mv">26.01.21 – 04.01</span></div>
+    <div class="compare-row"><span class="mn">광고비 (Spend)</span><span class="mv">$1,184K</span></div>
+    <div class="compare-row"><span class="mn">매출 (Revenue)</span><span class="mv">$1,580K</span></div>
+    <div class="compare-row"><span class="mn">ROAS</span><span class="mv">133%</span></div>
+    <div class="compare-row"><span class="mn">복귀자</span><span class="mv">1,054K명</span></div>
+    <div class="compare-row"><span class="mn">결제자</span><span class="mv">140K명</span></div>
+    <div class="compare-row"><span class="mn">PUR</span><span class="mv">13.29%</span></div>
+    <div class="compare-row"><span class="mn">ARPPU</span><span class="mv">$11.28</span></div>
+  </div>
+  <div class="compare-arrow">→</div>
+  <div class="compare-side after">
+    <div class="period">Phase 1</div>
+    <div class="compare-row"><span class="mn">운영 기간</span><span class="mv">26.04.02 – 06.09</span></div>
+    <div class="compare-row"><span class="mn">광고비 (Spend)</span><span class="mv up">$1,509K ▲27%</span></div>
+    <div class="compare-row"><span class="mn">매출 (Revenue)</span><span class="mv up">$1,974K ▲25%</span></div>
+    <div class="compare-row"><span class="mn">ROAS</span><span class="mv down">131% ▼2%p</span></div>
+    <div class="compare-row"><span class="mn">복귀자</span><span class="mv up">1,374K명 ▲30%</span></div>
+    <div class="compare-row"><span class="mn">결제자</span><span class="mv up">190K명 ▲36%</span></div>
+    <div class="compare-row"><span class="mn">PUR</span><span class="mv up">13.83% ▲4%p</span></div>
+    <div class="compare-row"><span class="mn">ARPPU</span><span class="mv down">$10.39 ▼8%</span></div>
+  </div>
+</div>
+<p class="footnote">* ARPU·ARPPU 소폭 하락은 비결제 세그먼트를 테스트 운영하면서 전체 평균 객단가가 희석된 영향으로, 결제 세그먼트 단독 성과로는 해석되지 않음.</p>
+
+<hr class="divider">
+
+<!-- ── 4. Test Design ── -->
+<div class="section-label"><span class="dot"></span> 테스트 설계</div>
+<h2>무엇을 어떻게 나눠서 테스트했나</h2>
+<p style="margin-bottom:14px">"마지막으로 게임에 접속한 시점"과 "결제 여부"를 기준으로 유저를 7개 구간으로 나눠 광고를 집행했습니다. 각 구간마다 다른 메시지와 오퍼를 적용해 어느 유저군이 가장 효율적인지 검증했습니다.</p>
+
+<div class="segment-tree">
+  <div class="seg-header">세그먼트 구성 및 목표 ROAS 달성 여부 (목표: 25% 이상)</div>
+  <div class="seg-row"><span class="seg-badge badge-payer">결제 유저</span><span class="seg-name">D1 이내 — 어제까지 접속한 결제 유저</span><span class="seg-roas pass">ROAS 152.6% ✓</span></div>
+  <div class="seg-row"><span class="seg-badge badge-payer">결제 유저</span><span class="seg-name">D7 이내 — 일주일 내 접속한 결제 유저</span><span class="seg-roas pass">ROAS 116.7% ✓</span></div>
+  <div class="seg-row"><span class="seg-badge badge-payer">결제 유저</span><span class="seg-name">D28 이내 — 한 달 내 접속한 결제 유저</span><span class="seg-roas pass">ROAS 74.8% ✓</span></div>
+  <div class="seg-row"><span class="seg-badge badge-payer">결제 유저</span><span class="seg-name">D90 이내 — 3개월 내 접속한 결제 유저</span><span class="seg-roas pass">ROAS 34.4% ✓</span></div>
+  <div class="seg-row"><span class="seg-badge badge-payer">결제 유저</span><span class="seg-name">D365 이내 — 1년 내 접속한 장기이탈 결제 유저</span><span class="seg-roas pass">ROAS 147.5% ✓</span></div>
+  <div class="seg-row"><span class="seg-badge badge-nonpay">비결제 유저</span><span class="seg-name">D1~7 × LV4 이상 — 활성 비결제 유저</span><span class="seg-roas fail">ROAS 22.7% —</span></div>
+  <div class="seg-row"><span class="seg-badge badge-nonpay">비결제 유저</span><span class="seg-name">D7~28 × LV4 이상 — 중기 비결제 유저</span><span class="seg-roas fail">ROAS 18.4% —</span></div>
+</div>
+
+<hr class="divider">
+
+<!-- ── 5. ROAS chart ── -->
+<div class="section-label"><span class="dot"></span> 세그먼트별 성과</div>
+<h2>이탈 기간이 길수록 ROAS 하락 — 단, 장기이탈(D365)에서 반등</h2>
+<p style="margin-bottom:14px">결제 유저는 이탈 기간이 길어질수록 ROAS가 하락하는 패턴을 보이지만, D365 이내에서는 과거 고가치 유저 비중이 높아 예외적으로 반등합니다.</p>
+
+<div class="roas-bars" id="roasBars"></div>
+
+<hr class="divider">
+
+<!-- ── 6. Key Insights ── -->
+<div class="section-label"><span class="dot"></span> 핵심 인사이트</div>
+<h2>어디서 무엇을 발견했나</h2>
+<div class="insight-grid">
+  <div class="insight-card">
+    <span class="tag tag-blue">규모 1위</span>
+    <h3>D1 이내 — 규모와 효율 모두 압도적</h3>
+    <p>복귀자 717K명, 결제자 102K명으로 전 세그먼트 최다. ROAS 152.6%로 최상위. 핵심 운영 구간으로 확정.</p>
+  </div>
+  <div class="insight-card">
+    <span class="tag tag-green">객단가 1위</span>
+    <h3>D7 이내 — 1인당 결제액이 가장 높음</h3>
+    <p>ARPPU $11.93으로 D1 이내($7.05) 대비 68% 높음. 고가치 결제 유저 비중이 집중된 구간. D1과 병행 운영이 최적.</p>
+  </div>
+  <div class="insight-card">
+    <span class="tag tag-amber">Win-back 가능성</span>
+    <h3>D365 이내 — 작지만 ARPPU 최고</h3>
+    <p>복귀자 2,113명으로 규모는 작으나 ROAS 147.5%, ARPPU $14.57(전 구간 최고). 장기이탈 유저 중 과거 고가치 유저 비중이 높음.</p>
+  </div>
+  <div class="insight-card">
+    <span class="tag tag-gray">추가 검증 필요</span>
+    <h3>비결제 유저 — YouAppi만 목표 근접</h3>
+    <p>전체 ROAS 22.7%로 목표 미달이나, YouAppi 단일 매체는 59.9% 달성. AOS IAA 수익 포함 시 추가 개선 가능성 있음.</p>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ── 7. Next Step ── -->
+<div class="section-label"><span class="dot"></span> 다음 단계</div>
+<h2>Phase 1 이후 로드맵</h2>
+<div class="timeline">
+  <div class="tl-item">
+    <div class="tl-left"><div class="tl-dot done"></div><div class="tl-line"></div></div>
+    <div class="tl-content">
+      <div class="phase-label">Phase 1 · 완료</div>
+      <h3>결제 여부 × 마지막 접속일</h3>
+      <p>세그먼트 기준 유효성 확인 + 베이스라인 확정. 결제 유저 전 세그먼트 ROAS 25% 이상 달성.</p>
+      <span class="tl-status status-done">✓ 목표 달성</span>
+    </div>
+  </div>
+  <div class="tl-item">
+    <div class="tl-left"><div class="tl-dot next"></div><div class="tl-line"></div></div>
+    <div class="tl-content">
+      <div class="phase-label">Phase 2 · 예정</div>
+      <h3>누적 결제금액 × 마지막 결제일</h3>
+      <p>고액($500+) / 중액 / 소액 유저를 차별화해 ROAS 개선 폭 측정. Phase 1 이전 운영과 유사한 타겟 구조로 결과 비교 예정.</p>
+      <span class="tl-status status-next">진행 예정</span>
+    </div>
+  </div>
+  <div class="tl-item">
+    <div class="tl-left"><div class="tl-dot future"></div></div>
+    <div class="tl-content">
+      <div class="phase-label">Phase 3~5 · 향후</div>
+      <h3>LTV 구간 / 당첨 경험 / 플레이 강도 기반 세그먼트</h3>
+      <p>각 Phase에서 학습된 데이터를 바탕으로 세그먼트 기준을 점차 고도화. 최종적으로 상시 운영 세그먼트 구조를 확정할 계획.</p>
+      <span class="tl-status status-future">향후 진행</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const segments = [
+  { name: 'D1 이내',       roas: 152.6, color: '#1D9E75', pass: true  },
+  { name: 'D7 이내',       roas: 116.7, color: '#378ADD', pass: true  },
+  { name: 'D28 이내',      roas:  74.8, color: '#EF9F27', pass: true  },
+  { name: 'D90 이내',      roas:  34.4, color: '#5DCAA5', pass: true  },
+  { name: 'D365 이내',     roas: 147.5, color: '#BA7517', pass: true  },
+  { name: '비결제 D1~7',   roas:  22.7, color: '#B4B2A9', pass: false },
+  { name: '비결제 D7~28',  roas:  18.4, color: '#B4B2A9', pass: false },
+];
+const maxRoas = 160;
+const container = document.getElementById('roasBars');
+
+segments.forEach(s => {
+  const pct = Math.round((s.roas / maxRoas) * 100);
+  container.innerHTML += `
+    <div class="roas-bar-row">
+      <div class="roas-bar-label">${s.name}</div>
+      <div class="roas-bar-track">
+        <div class="roas-bar-fill" style="width:${pct}%;background:${s.color}">
+          <span style="font-size:11px;color:#fff;font-weight:500;white-space:nowrap"></span>
+        </div>
+      </div>
+      <div class="roas-bar-val" style="color:${s.pass ? '#1D9E75' : '#888'}">${s.roas.toFixed(1)}%</div>
+      <div class="roas-bar-check" style="color:${s.pass ? '#1D9E75' : '#aaa'}">${s.pass ? '✓' : '—'}</div>
+    </div>`;
+});
+</script>
+</body>
+</html>
